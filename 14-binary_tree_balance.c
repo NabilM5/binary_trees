@@ -1,41 +1,55 @@
 #include "binary_trees.h"
 
 /**
- * binary_tree_balance - measures the balance factor of a binary tree
- * @tree: pointer to the root node of the tree to measure the balance factor
- *
- * Return: the balance factor
- *         0 if tree is NULL
+ * bst_remove - removes a node from a Binary Search Tree
+ * @root: a pointer to the root node of the tree where you will remove a node
+ * @value: the value to remove in the tree
+ * Return: a pointer to the new root node of the tree after removal
+ *         NULL on failure
  */
-int binary_tree_balance(const binary_tree_t *tree)
+bst_t *bst_remove(bst_t *root, int value)
 {
-	int height_l, height_r;
+	bst_t *tmp = NULL;
 
-	if (!tree)
-		return (0);
+	if (!root)
+		return (NULL);
 
-	height_l = tree->left ? (int)binary_tree_height(tree->left) : -1;
-	height_r = tree->right ? (int)binary_tree_height(tree->right) : -1;
-
-	return (height_l - height_r);
+	if (value < root->n)
+		root->left = bst_remove(root->left, value);
+	else if (value > root->n)
+		root->right = bst_remove(root->right, value);
+	else
+	{
+		if (!root->left)
+		{
+			tmp = root->right;
+			free(root);
+			return (tmp);
+		}
+		else if (!root->right)
+		{
+			tmp = root->left;
+			free(root);
+			return (tmp);
+		}
+		tmp = bst_min_val(root->right);
+		root->n = tmp->n;
+		root->right = bst_remove(root->right, tmp->n);
+	}
+	return (root);
 }
 
 /**
- * binary_tree_height - measures the height of a binary tree
- * @tree: tree to measure the height of
- *
- * Return: height of the tree
- *         0 if tree is NULL
+ * bst_min_val - finds the smallest node from a Binary Search Tree
+ * @root: a pointer to the root node of the tree
+ * Return: a pointer to the smallest node
  */
-size_t binary_tree_height(const binary_tree_t *tree)
+bst_t *bst_min_val(bst_t *root)
 {
-	size_t height_l = 0;
-	size_t height_r = 0;
+	bst_t *min = root;
 
-	if (!tree)
-		return (0);
+	while (min->left)
+		min = min->left;
 
-	height_l = tree->left ? 1 + binary_tree_height(tree->left) : 0;
-	height_r = tree->right ? 1 + binary_tree_height(tree->right) : 0;
-	return (height_l > height_r ? height_l : height_r);
+	return (min);
 }
